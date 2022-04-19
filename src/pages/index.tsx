@@ -1,10 +1,16 @@
-import { GetServerSideProps } from "next";
+import { GetServerSideProps, GetStaticProps } from "next";
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import { SubscribeButton } from "../components/SubscribeButton";
 import { stripe } from "../services/stripe";
 
 import styles from "./home.module.scss";
+
+
+//  Client Side: Quand
+//  Server Side: Quando precisamos de indexação e dados dinâmicos da sessão do usuário.
+//  Static Site Generation: Geralmente usado em páginas que seu conteúdo é compatilhado 
+//   para diversos usuários e quando precisamos de indexação. 
 
 interface HomeProps {
   product: {
@@ -37,7 +43,12 @@ export default function Home({ product }: HomeProps) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async () => {
+
+// SSR - Chamada de Server Side Rendering
+// export const getServerSideProps: GetServerSideProps = async () => {
+
+// SSG - Chamada de Static Site Generation
+export const getStaticProps: GetStaticProps = async () => {
   const price = await stripe.prices.retrieve('price_1KoZF8A2kQfp3nasfEo17f95', {
     expand: ['product']
   })
@@ -53,6 +64,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
   return {
     props: {
       product
-    }
+    },
+    revalidate: 60 * 60 * 24 //24 hours
   }
 }
